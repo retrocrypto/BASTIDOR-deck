@@ -3,18 +3,15 @@
 import React, { useState, useMemo } from 'react';
 
 export default function BastidorEstimatorApp() {
-  // Estimator State
   const [areaSqFt, setAreaSqFt] = useState<number>(2500);
-  const [roofPitch, setRoofPitch] = useState<number>(6); // 6/12 pitch
+  const [roofPitch, setRoofPitch] = useState<number>(6); // 6/12 pitch default
   const [materialType, setMaterialType] = useState<string>('architectural');
   const [includeThermal, setIncludeThermal] = useState<boolean>(true);
   const [include3dModel, setInclude3dModel] = useState<boolean>(true);
 
-  // Interactive Tactical Dashboard State
   const [isScanning, setIsScanning] = useState<boolean>(true);
   const [cameraMode, setCameraMode] = useState<'thermal' | 'rgb' | 'mesh'>('thermal');
 
-  // Client Details
   const [clientName, setClientName] = useState<string>('');
   const [clientEmail, setClientEmail] = useState<string>('');
   const [clientPhone, setClientPhone] = useState<string>('');
@@ -22,8 +19,8 @@ export default function BastidorEstimatorApp() {
   const [copied, setCopied] = useState<boolean>(false);
   const [mailClicked, setMailClicked] = useState<boolean>(false);
 
-  // Dynamic calculations
   const calculations = useMemo(() => {
+    // Trigonometric effective surface area expansion formula
     const pitchFactor = 1 + (roofPitch / 12) * 0.15;
     const adjustedArea = areaSqFt * pitchFactor;
 
@@ -37,7 +34,7 @@ export default function BastidorEstimatorApp() {
     const materialRate = rates[materialType] || 6.2;
     const baseMaterialCost = adjustedArea * materialRate;
 
-    let droneCost = 350;
+    let droneCost = 350; // Base flight scanning fee
     if (includeThermal) droneCost += 250;
     if (include3dModel) droneCost += 300;
 
@@ -70,8 +67,8 @@ Notes: ${notes || 'None'}
 Roof / Surface Area: ${areaSqFt.toLocaleString()} sq ft
 Roof Pitch: ${roofPitch}/12
 Material Selected: ${materialType.toUpperCase()}
-Thermal Infrared Flight: ${includeThermal ? 'YES' : 'NO'}
-3D Mesh Model: ${include3dModel ? 'YES' : 'NO'}
+Thermal Infrared Flight: ${includeThermal ? 'YES (Starting $250 CAD)' : 'NO'}
+3D Mesh Model: ${include3dModel ? 'YES (Starting $300 CAD)' : 'NO'}
 
 --- CALCULATED FIGURES ---
 Calculated Effective Area: ${calculations.adjustedArea.toLocaleString()} sq ft
@@ -96,7 +93,7 @@ Thank you!`;
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-mono selection:bg-emerald-500 selection:text-slate-950 pb-20">
       
-      {/* HEADER */}
+      {}
       <header className="border-b border-emerald-900/40 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -134,7 +131,7 @@ Thank you!`;
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
         
-        {/* STATS TELEMETRY GRID */}
+        {}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-slate-900/80 border border-emerald-900/50 rounded-xl p-3.5 relative overflow-hidden group hover:border-emerald-500/50 transition">
             <div className="flex justify-between items-start text-xs text-slate-400 uppercase tracking-wider mb-1 font-sans">
@@ -177,9 +174,8 @@ Thank you!`;
           </div>
         </div>
 
-        {/* TACTICAL LIVE SCANNER RADAR SCREEN */}
+        {}
         <div className="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-4 sm:p-6 relative overflow-hidden shadow-2xl">
-          {/* Radar HUD Controls Header */}
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-900/50 pb-3 mb-4 text-xs">
             <div className="flex items-center gap-2">
               <span className={`w-2.5 h-2.5 rounded-full ${isScanning ? 'bg-emerald-400 animate-ping' : 'bg-amber-400'}`}></span>
@@ -196,7 +192,6 @@ Thank you!`;
 
           {/* Grid Canvas Screen */}
           <div className="relative w-full h-64 sm:h-72 bg-slate-950 border border-emerald-900/60 rounded-xl overflow-hidden flex items-center justify-center">
-            {/* Grid background lines */}
             <div 
               className="absolute inset-0 opacity-20 pointer-events-none"
               style={{
@@ -205,28 +200,24 @@ Thank you!`;
               }}
             ></div>
 
-            {/* Radar Circular Target Overlay */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-full border border-emerald-500/20 flex items-center justify-center">
                 <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-full border border-emerald-500/40 border-dashed"></div>
               </div>
             </div>
 
-            {/* Scanning Laser Fan Effect */}
             {isScanning && (
               <div className="absolute top-0 inset-x-0 h-full bg-gradient-to-b from-emerald-500/20 via-emerald-500/5 to-transparent animate-pulse pointer-events-none"></div>
             )}
 
-            {/* HIGH-TECH DRONE VECTOR GRAPHIC */}
+            {/* Drone Vector HUD Graphic */}
             <div className="relative z-10 flex flex-col items-center">
               <div className="relative w-36 h-36 sm:w-40 sm:h-40">
-                {/* Rotors */}
                 <div className="absolute top-2 left-2 w-8 h-8 rounded-full border-2 border-emerald-400/80 animate-spin"></div>
                 <div className="absolute top-2 right-2 w-8 h-8 rounded-full border-2 border-emerald-400/80 animate-spin"></div>
                 <div className="absolute bottom-2 left-2 w-8 h-8 rounded-full border-2 border-emerald-400/80 animate-spin"></div>
                 <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full border-2 border-emerald-400/80 animate-spin"></div>
 
-                {/* Quadcopter Arms */}
                 <svg className="w-full h-full text-emerald-400 drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" viewBox="0 0 100 100" fill="none">
                   <path d="M20 20 L50 50 L80 20 M20 80 L50 50 L80 80" stroke="currentColor" strokeWidth="2.5" />
                   <circle cx="50" cy="50" r="14" fill="#020617" stroke="currentColor" strokeWidth="2.5" />
@@ -234,12 +225,10 @@ Thank you!`;
                   <path d="M50 36 L50 22 M50 64 L50 78 M36 50 L22 50 M64 50 L78 50" stroke="currentColor" strokeWidth="1.5" />
                 </svg>
 
-                {/* Laser Scanning Cone Beam */}
                 <div className="absolute top-24 left-1/2 -translate-x-1/2 w-28 h-20 bg-gradient-to-b from-emerald-400/30 via-emerald-500/10 to-transparent blur-xs pointer-events-none origin-top clip-path-polygon"></div>
               </div>
             </div>
 
-            {/* Telemetry Footer Info */}
             <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center text-[10px] sm:text-xs text-emerald-400/80 bg-slate-950/80 backdrop-blur-xs p-2 rounded-lg border border-emerald-900/50">
               <div>UNIT: <span className="text-white font-bold">DJI-M30T ENGINE</span></div>
               <div className="flex items-center gap-2">
@@ -249,7 +238,6 @@ Thank you!`;
             </div>
           </div>
 
-          {/* Interactive Mode Toggles */}
           <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
             <div className="flex gap-2">
               {(['thermal', 'rgb', 'mesh'] as const).map((mode) => (
@@ -276,10 +264,9 @@ Thank you!`;
           </div>
         </div>
 
-        {/* ESTIMATOR SLIDERS & CONTROLS */}
+        {}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Left Column: Sliders */}
           <div className="lg:col-span-7 space-y-5 font-sans">
             
             {/* Surface Area Slider */}
@@ -360,7 +347,7 @@ Thank you!`;
               </div>
             </div>
 
-            {/* Drone Analytics Options */}
+            {}
             <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
               <label className="block text-sm font-bold text-slate-200 mb-3">
                 Bastidor Drone Payload Services
@@ -379,7 +366,7 @@ Thank you!`;
                       <div className="text-[11px] text-slate-400">Detect subsurface water intrusion &amp; envelope energy loss</div>
                     </div>
                   </div>
-                  <span className="text-xs font-mono font-bold text-emerald-400">+$250 CAD</span>
+                  <span className="text-xs font-mono font-bold text-emerald-400">+$250 CAD (From)</span>
                 </label>
 
                 <label className="flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-slate-950/50 cursor-pointer">
@@ -395,14 +382,14 @@ Thank you!`;
                       <div className="text-[11px] text-slate-400 font-sans">High-precision photogrammetry point-cloud model</div>
                     </div>
                   </div>
-                  <span className="text-xs font-mono font-bold text-emerald-400">+$300 CAD</span>
+                  <span className="text-xs font-mono font-bold text-emerald-400">+$300 CAD (From)</span>
                 </label>
               </div>
             </div>
 
           </div>
 
-          {/* Right Column: Dynamic Quote Form */}
+          {}
           <div className="lg:col-span-5 font-sans space-y-6">
             
             <div className="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
@@ -494,7 +481,7 @@ Thank you!`;
                   className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs rounded-xl transition flex items-center justify-center gap-2"
                 >
                   <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2 2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2 2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                   {copied ? '✓ Email Copied to Clipboard!' : 'Copy Email Address (steven@bastidor.ca)'}
                 </button>
