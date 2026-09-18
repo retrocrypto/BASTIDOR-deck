@@ -1,3 +1,5 @@
+bastidor V4.0 with corrected 4Tab navigationbar correction code:
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -24,7 +26,7 @@ interface DiscrepancyItem {
   coordinates: string;
 }
 
-export default function BastidorV4SpatialAIEngine() {
+export default function Page() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('lsm_inspector');
   const [scanMode, setScanMode] = useState<ScanMode>('thermal');
   const [isLiveScanning, setIsLiveScanning] = useState<boolean>(true);
@@ -50,7 +52,7 @@ export default function BastidorV4SpatialAIEngine() {
       id: 'LOG-8801',
       tagId: 'NTAG-424-C281',
       locationName: 'Structural Beam Joint - Grid C4',
-      timestamp: new Date(Date.now() - 3600000).toLocaleTimeString() + ' EDT',
+      timestamp: '10:15 AM EDT',
       inspector: 'S. Ramirez (Lead Auditor)',
       hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
       status: 'VERIFIED',
@@ -59,7 +61,7 @@ export default function BastidorV4SpatialAIEngine() {
       id: 'LOG-8802',
       tagId: 'NTAG-424-F109',
       locationName: 'Firestop Sleeve Core #04',
-      timestamp: new Date(Date.now() - 1800000).toLocaleTimeString() + ' EDT',
+      timestamp: '09:45 AM EDT',
       inspector: 'Field Tech #12 (Ontario Ops)',
       hash: '7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504d978c197',
       status: 'VERIFIED',
@@ -126,7 +128,7 @@ export default function BastidorV4SpatialAIEngine() {
 
   const mailtoUrl = useMemo(() => {
     const subject = encodeURIComponent(
-      `Bastidor V4.0 AI Spatial Scoping & Audit Request - ${clientName || 'Megaproject Client'}`
+      `Bastidor V4.0 AI Spatial Scoping Request - ${clientName || 'Megaproject Client'}`
     );
 
     const bodyText = `Hello Steven Ramirez (Director of Operations),
@@ -179,7 +181,7 @@ Thank you!`;
       id: newId,
       tagId: `NTAG-424-X${Math.floor(100 + Math.random() * 900)}`,
       locationName: `Concrete Slab Core Tag #${Math.floor(1 + Math.random() * 20)}`,
-      timestamp: new Date().toLocaleTimeString() + ' EDT',
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' EDT',
       inspector: 'S. Ramirez (Verified Tap)',
       hash: randomHex,
       status: 'VERIFIED',
@@ -242,7 +244,6 @@ Thank you!`;
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
-        {}
         {/* Top 4 Telemetry Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-slate-900/80 border border-emerald-900/50 rounded-xl p-3.5 relative overflow-hidden">
@@ -286,7 +287,6 @@ Thank you!`;
           </div>
         </div>
 
-        {}
         {/* 4-Tab Navigation Bar */}
         <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-2">
           {[
@@ -310,7 +310,6 @@ Thank you!`;
           ))}
         </div>
 
-        {}
         {/* Tab 1: LSM BIM Inspector */}
         {activeTab === 'lsm_inspector' && (
           <div className="space-y-6">
@@ -441,7 +440,6 @@ Thank you!`;
           </div>
         )}
 
-        {}
         {/* Tab 2: Cellular NTRIP RTK */}
         {activeTab === 'ntrip_rtk' && (
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5 font-sans">
@@ -476,14 +474,13 @@ Thank you!`;
           </div>
         )}
 
-        {}
         {/* Tab 3: NFC Verified Tap Ledger */}
         {activeTab === 'nfc_ledger' && (
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5 font-sans">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono">
               <div>
                 <h3 className="text-base font-bold text-slate-100 uppercase">
-                  NTAG 424 DNA Cryptographic "Verified Tap" Audit Ledger
+                  NTAG 424 DNA Cryptographic &quot;Verified Tap&quot; Audit Ledger
                 </h3>
                 <p className="text-xs text-slate-400 font-sans mt-0.5">
                   Insurer-grade physical asset verification. Every tap generates a dynamic AES-128 cryptographic event hash (H_event).
@@ -521,7 +518,6 @@ Thank you!`;
           </div>
         )}
 
-        {}
         {/* Tab 4: Dynamic Material Scoper (Original Layout Preserved) */}
         {activeTab === 'material_scoper' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -691,7 +687,6 @@ Thank you!`;
                   </div>
                 </div>
 
-                {}
                 {/* Direct Contact & Submission Box */}
                 <div className="mt-6 pt-6 border-t border-slate-800 space-y-3">
                   <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider font-mono">
@@ -771,4 +766,5 @@ Thank you!`;
 }
 ```
 
-Once committed to GitHub, Vercel will build this clean V4.0 update in under 45 seconds. Refresh your browser (or use Incognito mode) to test the new 4-tab bar live on **`https://www.bastidor.ca`**!
+***
+
