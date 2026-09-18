@@ -1,820 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>BASTIDOR | Drone & Material Estimator</title>
-<style>
-  :root{
-    --bg: #090D16;
-    --panel: #0F172A;
-    --border: #1E293B;
-    --cyan: #00F2FE;
-    --teal: #4FACFE;
-    --text-hi: #F1F5F9;
-    --text-mid: #94A3B8;
-    --text-low: #56607A;
-    --sans: -apple-system, "Segoe UI", "Helvetica Neue", Arial, "Liberation Sans", system-ui, sans-serif;
-    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Liberation Mono", Consolas, monospace;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html, body {
-    background: #2b2f36;
-    font-family: var(--sans);
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-
-  .mono { font-family: var(--mono); }
-
-  .page {
-    width: 1080px;
-    height: 1350px;
-    position: relative;
-    background:
-      radial-gradient(ellipse 900px 520px at 78% -6%, rgba(0,242,254,0.10), transparent 60%),
-      radial-gradient(ellipse 700px 500px at -5% 105%, rgba(79,172,254,0.07), transparent 55%),
-      var(--bg);
-    color: var(--text-hi);
-    overflow: hidden;
-    margin: 0 auto 40px auto;
-    display: flex;
-    flex-direction: column;
-    padding: 60px 72px 48px 72px;
-  }
-
-  .page::before{
-    content:"";
-    position:absolute; inset:0;
-    background-image:
-      linear-gradient(rgba(148,163,184,0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148,163,184,0.035) 1px, transparent 1px);
-    background-size: 54px 54px;
-    pointer-events:none;
-  }
-
-  /* ---------- Header ---------- */
-  .brandbar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-    z-index: 2;
-  }
-  .brandmark{
-    display:flex;
-    align-items:center;
-    gap: 11px;
-  }
-  .brandmark .dot{
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--cyan);
-    box-shadow: 0 0 14px 2px rgba(0,242,254,0.65);
-    flex-shrink: 0;
-  }
-  .brandmark span{
-    font-size: 15px;
-    letter-spacing: 0.005em;
-    color: var(--text-mid);
-    font-weight: 500;
-  }
-  .brandmark b{
-    color: var(--text-hi);
-    font-weight: 700;
-  }
-  .brand-tag{
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--text-low);
-    letter-spacing: 0.06em;
-  }
-
-  /* ---------- Slide 1 ---------- */
-  .hero-title{
-    margin-top: 38px;
-    position: relative;
-    z-index: 2;
-  }
-  .hero-title h1{
-    font-size: 54px;
-    line-height: 1.1;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    max-width: 760px;
-    color: var(--text-hi);
-  }
-  .hero-sub{
-    margin-top: 16px;
-    font-size: 16.5px;
-    color: var(--text-mid);
-    max-width: 500px;
-    line-height: 1.6;
-  }
-
-  .metric-grid{
-    margin-top: 40px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    position: relative;
-    z-index: 2;
-  }
-  .metric-card{
-    background: linear-gradient(180deg, rgba(15,23,42,0.9), rgba(15,23,42,0.55));
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px 18px;
-    position: relative;
-  }
-  .metric-card::after{
-    content:"";
-    position:absolute; left:0; top:0; bottom:0; width:2px;
-    background: linear-gradient(180deg, var(--cyan), transparent);
-    opacity:0.8;
-  }
-  .metric-value{
-    font-family: var(--mono);
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--text-hi);
-    display: flex;
-    align-items: baseline;
-    gap: 5px;
-  }
-  .metric-value small{
-    font-size: 13px;
-    color: var(--teal);
-    font-weight: 500;
-  }
-  .metric-label{
-    margin-top: 8px;
-    font-size: 12.5px;
-    color: var(--text-mid);
-  }
-
-  /* radar / scope area */
-  .scope-stage{
-    margin-top: 36px;
-    flex: 1;
-    min-height: 0;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: radial-gradient(ellipse at center, rgba(0,242,254,0.04), rgba(9,13,22,0.2) 70%);
-    position: relative;
-    z-index: 2;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-  }
-  .scope-stage svg{ width: 84%; height: 84%; max-width: 560px; max-height: 560px; }
-  .scope-stage .corner{
-    position:absolute; width:20px; height:20px; border-color: rgba(0,242,254,0.5);
-  }
-  .scope-stage .corner.tl{ top:18px; left:18px; border-top:2px solid; border-left:2px solid; }
-  .scope-stage .corner.tr{ top:18px; right:18px; border-top:2px solid; border-right:2px solid; }
-  .scope-stage .corner.bl{ bottom:18px; left:18px; border-bottom:2px solid; border-left:2px solid; }
-  .scope-stage .corner.br{ bottom:18px; right:18px; border-bottom:2px solid; border-right:2px solid; }
-
-  .stage-tag{
-    position:absolute; top: 22px; left: 50%; transform: translateX(-50%);
-    font-family: var(--mono);
-    font-size: 10.5px; letter-spacing: 0.09em;
-    color: var(--text-low);
-  }
-
-  /* ---------- Footer ---------- */
-  .footer{
-    margin-top: 26px;
-    padding-top: 18px;
-    border-top: 1px solid var(--border);
-    display:flex;
-    justify-content: space-between;
-    align-items:center;
-    font-size: 12.5px;
-    color: var(--text-low);
-    position: relative;
-    z-index: 2;
-    flex-shrink: 0;
-  }
-  .footer .fkey{
-    font-family: var(--mono);
-    color: var(--teal);
-  }
-
-  /* ---------- Slide 2 ---------- */
-  .s2-head{ margin-top: 34px; position:relative; z-index:2; }
-  .s2-head h2{ font-size: 37px; font-weight: 700; letter-spacing: -0.015em; }
-  .s2-head p{ margin-top: 10px; font-size: 15.5px; color: var(--text-mid); max-width: 600px; }
-
-  .tier-stack{
-    margin-top: 32px;
-    display:flex;
-    flex-direction: column;
-    gap: 13px;
-    position:relative; z-index:2;
-  }
-  .tier{
-    display:flex;
-    align-items:center;
-    gap: 22px;
-    background: linear-gradient(90deg, rgba(15,23,42,0.85), rgba(15,23,42,0.45));
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 23px 26px;
-  }
-  .tier-index{
-    font-family: var(--mono);
-    font-size: 12.5px;
-    color: var(--cyan);
-    border: 1px solid rgba(0,242,254,0.3);
-    background: rgba(0,242,254,0.06);
-    border-radius: 6px;
-    padding: 5px 9px;
-    flex-shrink:0;
-  }
-  .tier-body h3{
-    font-size: 18.5px;
-    font-weight: 600;
-    color: var(--text-hi);
-  }
-  .tier-body p{
-    margin-top: 5px;
-    font-size: 14px;
-    color: var(--text-mid);
-    line-height:1.55;
-    max-width: 640px;
-  }
-  .tier-bar{
-    margin-left:auto;
-    width: 3px;
-    align-self: stretch;
-    border-radius: 2px;
-    background: linear-gradient(180deg, var(--cyan), var(--teal));
-    opacity: 0.7;
-    flex-shrink:0;
-  }
-
-  .price-box{
-    margin-top: 24px;
-    border: 1px solid rgba(0,242,254,0.35);
-    background: linear-gradient(120deg, rgba(0,242,254,0.08), rgba(79,172,254,0.04));
-    border-radius: 14px;
-    padding: 28px 32px;
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    position:relative; z-index:2;
-  }
-  .price-box .plabel{
-    font-size: 13.5px;
-    color: var(--text-mid);
-    letter-spacing: 0.01em;
-  }
-  .price-box .pvalue{
-    font-family: var(--mono);
-    font-size: 29px;
-    font-weight: 700;
-    color: var(--text-hi);
-    margin-top: 6px;
-  }
-  .price-box .pvalue span{ color: var(--cyan); }
-  .price-box .pnote{
-    font-size: 12.5px;
-    color: var(--text-low);
-    text-align:right;
-    max-width: 210px;
-    line-height:1.55;
-  }
-
-  .s2-support{
-    margin-top: 34px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    position: relative;
-    z-index: 2;
-  }
-  .s2-support .sitem{
-    padding: 0 26px;
-    border-left: 1px solid var(--border);
-  }
-  .s2-support .sitem:first-child{ border-left: none; padding-left: 0; }
-  .s2-support .slabel2{
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.07em;
-    color: var(--text-low);
-  }
-  .s2-support .sval2{
-    margin-top: 10px;
-    font-size: 15px;
-    color: var(--text-hi);
-    line-height: 1.5;
-    max-width: 260px;
-  }
-
-  .s2-flow{
-    margin-top: 40px;
-    position: relative;
-    z-index: 2;
-  }
-  .s2-flow .flabel{
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.07em;
-    color: var(--text-low);
-    margin-bottom: 22px;
-  }
-  .flow-track{
-    position: relative;
-    height: 2px;
-    background: var(--border);
-    margin: 0 6px;
-  }
-  .flow-track .flow-fill{
-    position: absolute; left:0; top:0; bottom:0; width: 100%;
-    background: linear-gradient(90deg, var(--teal), var(--cyan));
-    opacity: 0.55;
-  }
-  .flow-steps{
-    display: flex;
-    justify-content: space-between;
-    margin-top: -6px;
-  }
-  .flow-step{
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    width: 140px;
-  }
-  .flow-step .fdot{
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--bg);
-    border: 2px solid var(--cyan);
-    box-shadow: 0 0 8px 1px rgba(0,242,254,0.5);
-  }
-  .flow-step .flab{
-    font-size: 14px;
-    color: var(--text-hi);
-    font-weight: 600;
-  }
-  .flow-step .fsub{
-    font-size: 12px;
-    color: var(--text-low);
-    text-align: center;
-  }
-
-  .s2-body{
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 38px;
-  }
-  .s2-body > *{ margin-top: 0 !important; }
-
-  /* ---------- Slide 3 ---------- */
-  .s3-head{ margin-top: 32px; position:relative; z-index:2; }
-  .s3-head h2{ font-size: 37px; font-weight:700; letter-spacing:-0.015em; }
-
-  .s3-body{
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 30px;
-  }
-  .s3-body > *{ margin-top: 0 !important; }
-
-  .split{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    align-items: stretch;
-    position:relative; z-index:2;
-  }
-  .panel{
-    border: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(15,23,42,0.9), rgba(15,23,42,0.5));
-    border-radius: 14px;
-    padding: 24px 24px;
-    display:flex;
-    flex-direction:column;
-  }
-  .panel-title{
-    font-size: 11.5px;
-    letter-spacing:0.07em;
-    color: var(--text-low);
-    font-family: var(--mono);
-    margin-bottom: 20px;
-  }
-
-  .slider-row{ margin-bottom: 26px; }
-  .slider-row .srow-top{
-    display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 11px;
-  }
-  .slider-row .slabel{ font-size: 14px; color: var(--text-mid); }
-  .slider-row .sval{ font-family: var(--mono); font-size: 14.5px; color: var(--cyan); font-weight:600; }
-  .track{
-    height: 6px; border-radius: 4px;
-    background: var(--border);
-    position:relative;
-  }
-  .track .fill{
-    position:absolute; left:0; top:0; bottom:0;
-    border-radius:4px;
-    background: linear-gradient(90deg, var(--teal), var(--cyan));
-  }
-  .track .knob{
-    position:absolute; top:50%; width:15px; height:15px; border-radius:50%;
-    background:#F1F5F9; border: 3px solid var(--cyan);
-    transform: translate(-50%,-50%);
-    box-shadow: 0 0 10px rgba(0,242,254,0.5);
-  }
-
-  .scope-output{
-    margin-top: 2px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: rgba(9,13,22,0.5);
-    padding: 18px 20px;
-    display:flex;
-    flex-direction:column;
-    gap: 13px;
-  }
-
-  .impact-list{
-    margin-top: 6px;
-    display:flex;
-    flex-direction:column;
-    gap: 16px;
-  }
-  .impact-row{
-    display:flex;
-    align-items:flex-start;
-    gap: 12px;
-    font-size: 13.5px;
-    color: var(--text-mid);
-    line-height: 1.5;
-  }
-  .impact-row .idot{
-    width:5px; height:5px; border-radius:50%;
-    background: var(--cyan);
-    margin-top: 7px;
-    flex-shrink:0;
-    box-shadow: 0 0 6px 1px rgba(0,242,254,0.5);
-  }
-  .impact-row b{ color: var(--text-hi); font-weight:600; }
-
-  .panel-note{
-    margin-top: 18px;
-    font-size: 13px;
-    color: var(--text-low);
-    line-height: 1.6;
-    border-top: 1px solid var(--border);
-    padding-top: 16px;
-  }
-
-  .panel-fill{ flex: 1; }
-  .scope-line{
-    display:flex; justify-content:space-between; font-size: 13.5px;
-    padding-bottom: 13px; border-bottom: 1px dashed rgba(148,163,184,0.15);
-  }
-  .scope-line:last-child{ border-bottom:none; padding-bottom:0; }
-  .scope-line .k{ color: var(--text-mid); }
-  .scope-line .v{ font-family: var(--mono); color: var(--text-hi); }
-
-  .cta-btn{
-    margin-top: 18px;
-    background: linear-gradient(90deg, var(--cyan), var(--teal));
-    color: #04141C;
-    text-align:center;
-    font-weight: 700;
-    font-size: 14.5px;
-    padding: 15px;
-    border-radius: 9px;
-    letter-spacing: 0.005em;
-  }
-
-  .cta-card{
-    margin-top: 16px;
-    border: 1px solid rgba(0,242,254,0.35);
-    background: linear-gradient(120deg, rgba(0,242,254,0.08), rgba(79,172,254,0.04));
-    border-radius: 14px;
-    padding: 26px 32px;
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    position:relative; z-index:2;
-    flex-shrink: 0;
-  }
-  .cta-card h3{
-    font-size: 20px;
-    font-weight: 700;
-    max-width: 380px;
-    line-height:1.4;
-  }
-  .cta-contacts{
-    display:flex;
-    flex-direction:column;
-    gap: 7px;
-    text-align:right;
-    flex-shrink: 0;
-  }
-  .cta-contacts .c1{
-    font-family: var(--mono);
-    font-size: 15.5px;
-    color: var(--cyan);
-    font-weight: 600;
-  }
-  .cta-contacts .c2{
-    font-family: var(--mono);
-    font-size: 13.5px;
-    color: var(--text-mid);
-  }
-
-  @media print{
-    html, body{ background: var(--bg); }
-    .page{
-      margin: 0;
-      box-shadow: none;
-      page-break-after: always;
-      width: 1080px;
-      height: 1350px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BASTIDOR | Enterprise Site Telemetry & Scoping Engine</title>
+  <style>
+    :root {
+      --bg: #090D16;
+      --panel: #0F172A;
+      --border: #1E293B;
+      --cyan: #00F2FE;
+      --teal: #4FACFE;
+      --text-hi: #F1F5F9;
+      --text-mid: #94A3B8;
+      --accent: rgba(0, 242, 254, 0.15);
     }
-    .page:last-child{ page-break-after: auto; }
-    @page{ size: 1080px 1350px; margin: 0; }
-  }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text-hi); padding: 20px; line-height: 1.5; }
+    .container { max-width: 900px; margin: 0 auto; }
+    
+    /* Header */
+    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+    .brand { font-size: 1.2rem; font-weight: 800; letter-spacing: 2px; color: var(--cyan); text-transform: uppercase; }
+    .badge { background: var(--accent); border: 1px solid var(--cyan); color: var(--cyan); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    
+    /* Hero Panel */
+    .hero { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 30px; margin-bottom: 30px; }
+    h1 { font-size: 1.8rem; margin-bottom: 10px; font-weight: 700; background: linear-gradient(to right, #FFF, var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    p.sub { color: var(--text-mid); font-size: 0.95rem; margin-bottom: 25px; }
+    
+    /* Dynamic Calculator */
+    .calc-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+    .slider-label { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; color: var(--text-mid); }
+    input[type=range] { width: 100%; accent-color: var(--cyan); margin-bottom: 15px; }
+    
+    /* Service Tier Buttons */
+    .tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .tier-card { background: var(--panel); border: 1px solid var(--border); padding: 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+    .tier-card:hover, .tier-card.active { border-color: var(--cyan); background: var(--accent); }
+    .tier-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; color: #FFF; }
+    .tier-price { font-size: 1.4rem; font-weight: 800; color: var(--cyan); margin-bottom: 10px; }
+    .tier-desc { font-size: 0.85rem; color: var(--text-mid); }
+    
+    /* Interactive Output Box */
+    .output-panel { background: var(--panel); border: 1px solid var(--cyan); border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+    .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    .total-price { font-size: 2rem; font-weight: 900; color: var(--cyan); }
+    
+    /* Buttons */
+    .btn { display: inline-block; width: 100%; text-align: center; background: linear-gradient(135deg, var(--cyan), var(--teal)); color: #000; font-weight: 700; padding: 14px; border-radius: 6px; text-decoration: none; border: none; font-size: 1rem; cursor: pointer; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.9; }
+    .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-mid); margin-top: 10px; }
+    .btn-secondary:hover { border-color: var(--cyan); color: #FFF; }
 
-  @media screen{
-    body{ padding: 40px 0; }
-  }
-</style>
+    /* Modal Drawer */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; padding: 20px; z-index: 100; }
+    .modal-content { background: var(--panel); border: 1px solid var(--cyan); border-radius: 12px; padding: 30px; max-width: 500px; width: 100%; }
+    .modal-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 15px; color: var(--cyan); }
+    .modal-close { background: none; border: none; color: var(--text-mid); float: right; font-size: 1.5rem; cursor: pointer; }
+  </style>
 </head>
 <body>
 
-<!-- ============ SLIDE 1 : THE HOOK ============ -->
-<section class="page">
-  <div class="brandbar">
-    <div class="brandmark">
-      <span class="dot"></span>
-      <span><b>BASTIDOR</b> | Drone &amp; Material Estimator</span>
-    </div>
-    <div class="brand-tag mono">GTA · COMMERCIAL &amp; HEAVY CIVIL</div>
-  </div>
+  <div class="container">
+    <header>
+      <div class="brand">BASTIDOR INTELLIGENCE</div>
+      <div class="badge">PROTOTYPE V2.0</div>
+    </header>
 
-  <div class="hero-title">
-    <h1>Enterprise Site Telemetry &amp; Custom Scoping</h1>
-    <p class="hero-sub">Drone-captured spatial intelligence for active job sites — volumetrics, thermal audits, and progress tracking built for GC-scale accountability.</p>
-  </div>
-
-  <div class="metric-grid">
-    <div class="metric-card">
-      <div class="metric-value mono">12<small>sites</small></div>
-      <div class="metric-label">Active Missions</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-value mono">4.2<small>TB</small></div>
-      <div class="metric-label">Data Captured</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-value mono">847<small>hrs</small></div>
-      <div class="metric-label">Flight Hours</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-value mono">2,450<small>ac</small></div>
-      <div class="metric-label">Coverage Area</div>
-    </div>
-  </div>
-
-  <div class="scope-stage">
-    <div class="stage-tag">LIVE MISSION FEED — M30T UNIT 04</div>
-    <span class="corner tl"></span><span class="corner tr"></span>
-    <span class="corner bl"></span><span class="corner br"></span>
-    <svg viewBox="0 0 620 620">
-      <defs>
-        <radialGradient id="sweepGrad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#00F2FE" stop-opacity="0.55"/>
-          <stop offset="100%" stop-color="#00F2FE" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <circle cx="310" cy="310" r="280" fill="none" stroke="#1E293B" stroke-width="1"/>
-      <circle cx="310" cy="310" r="210" fill="none" stroke="#1E293B" stroke-width="1"/>
-      <circle cx="310" cy="310" r="140" fill="none" stroke="#1E293B" stroke-width="1"/>
-      <circle cx="310" cy="310" r="70" fill="none" stroke="#1E293B" stroke-width="1"/>
-      <line x1="30" y1="310" x2="590" y2="310" stroke="#1E293B" stroke-width="1"/>
-      <line x1="310" y1="30" x2="310" y2="590" stroke="#1E293B" stroke-width="1"/>
-      <path d="M310 310 L310 30 A280 280 0 0 1 508 112 Z" fill="url(#sweepGrad)"/>
-      <circle cx="452" cy="180" r="4" fill="#4FACFE"/>
-      <circle cx="200" cy="420" r="4" fill="#4FACFE"/>
-      <circle cx="410" cy="440" r="4" fill="#4FACFE"/>
-      <circle cx="310" cy="310" r="3" fill="#00F2FE"/>
-
-      <g transform="translate(310,310)">
-        <circle r="34" fill="#0F172A" stroke="#00F2FE" stroke-width="1.5"/>
-        <g stroke="#94A3B8" stroke-width="2" fill="none">
-          <line x1="-30" y1="-30" x2="-14" y2="-14"/>
-          <line x1="30" y1="-30" x2="14" y2="-14"/>
-          <line x1="-30" y1="30" x2="-14" y2="14"/>
-          <line x1="30" y1="30" x2="14" y2="14"/>
-        </g>
-        <circle cx="-30" cy="-30" r="7" fill="none" stroke="#00F2FE" stroke-width="1.5"/>
-        <circle cx="30" cy="-30" r="7" fill="none" stroke="#00F2FE" stroke-width="1.5"/>
-        <circle cx="-30" cy="30" r="7" fill="none" stroke="#00F2FE" stroke-width="1.5"/>
-        <circle cx="30" cy="30" r="7" fill="none" stroke="#00F2FE" stroke-width="1.5"/>
-        <rect x="-12" y="-7" width="24" height="14" rx="3" fill="#090D16" stroke="#4FACFE" stroke-width="1.5"/>
-        <circle cx="0" cy="0" r="2.5" fill="#00F2FE"/>
-      </g>
-    </svg>
-  </div>
-
-  <div class="footer">
-    <span>Slide 1 / 3 — BASTIDOR Intelligence Group Inc.</span>
-    <span class="fkey">SITE-TELEMETRY.SCOPE</span>
-  </div>
-</section>
-
-<!-- ============ SLIDE 2 : ENTERPRISE SCOPING TIERS ============ -->
-<section class="page">
-  <div class="brandbar">
-    <div class="brandmark">
-      <span class="dot"></span>
-      <span><b>BASTIDOR</b> | Drone &amp; Material Estimator</span>
-    </div>
-    <div class="brand-tag mono">SCOPING ARCHITECTURE</div>
-  </div>
-
-  <div class="s2-body">
-  <div class="s2-head">
-    <h2>Custom Telemetry Solutions</h2>
-    <p>Scalable site intelligence for GTA commercial &amp; heavy civil builds.</p>
-  </div>
-
-  <div class="tier-stack">
-    <div class="tier">
-      <span class="tier-index mono">01</span>
-      <div class="tier-body">
-        <h3>Multi-Month Progress Tracking</h3>
-        <p>Scheduled drone passes — initial scouting flight plus monthly site updates through the build cycle.</p>
-      </div>
-      <span class="tier-bar"></span>
-    </div>
-    <div class="tier">
-      <span class="tier-index mono">02</span>
-      <div class="tier-body">
-        <h3>Core 3D Mapping &amp; Volumetrics</h3>
-        <p>3D orthomosaics and stockpile calculations, delivered with direct CAD integration for your engineering team.</p>
-      </div>
-      <span class="tier-bar"></span>
-    </div>
-    <div class="tier">
-      <span class="tier-index mono">03</span>
-      <div class="tier-body">
-        <h3>Thermal &amp; Building Envelope Audits</h3>
-        <p>Infrared inspection passes paired with structural integrity audits for envelope and system diagnostics.</p>
-      </div>
-      <span class="tier-bar"></span>
-    </div>
-  </div>
-
-  <div class="s2-support">
-    <div class="sitem">
-      <div class="slabel2">TURNAROUND</div>
-      <div class="sval2">Processed data delivered 48–72 hrs after each flight</div>
-    </div>
-    <div class="sitem">
-      <div class="slabel2">DATA FORMATS</div>
-      <div class="sval2">GeoTIFF, LAS point cloud, and DWG/DXF exports</div>
-    </div>
-    <div class="sitem">
-      <div class="slabel2">SITE COMPLIANCE</div>
-      <div class="sval2">Insured operators, WSIB-covered, site-safety certified</div>
-    </div>
-  </div>
-
-  <div class="s2-flow">
-    <div class="flabel">ENGAGEMENT WORKFLOW</div>
-    <div class="flow-track"><div class="flow-fill"></div></div>
-    <div class="flow-steps">
-      <div class="flow-step"><span class="fdot"></span><span class="flab">Scout</span><span class="fsub">Initial site walk &amp; flight plan</span></div>
-      <div class="flow-step"><span class="fdot"></span><span class="flab">Capture</span><span class="fsub">Scheduled drone passes</span></div>
-      <div class="flow-step"><span class="fdot"></span><span class="flab">Process</span><span class="fsub">Mapping, volumetrics, thermal</span></div>
-      <div class="flow-step"><span class="fdot"></span><span class="flab">Deliver</span><span class="fsub">CAD-ready package handoff</span></div>
-    </div>
-  </div>
-
-  <div class="price-box">
-    <div>
-      <div class="plabel">Commercial Project Packages</div>
-      <div class="pvalue">$10,000 <span>–</span> $15,000+</div>
-    </div>
-    <div class="pnote">Scoped per site based on acreage, duration, and deliverable depth.</div>
-  </div>
-  </div>
-
-  <div class="footer">
-    <span>Slide 2 / 3 — BASTIDOR Scoping Architecture</span>
-    <span class="fkey">TIER-01 → TIER-03</span>
-  </div>
-</section>
-
-<!-- ============ SLIDE 3 : CUSTOM PROPOSAL & CTA ============ -->
-<section class="page">
-  <div class="brandbar">
-    <div class="brandmark">
-      <span class="dot"></span>
-      <span><b>BASTIDOR</b> | Drone &amp; Material Estimator</span>
-    </div>
-    <div class="brand-tag mono">PROPOSAL BUILDER</div>
-  </div>
-
-  <div class="s3-body">
-  <div class="s3-head">
-    <h2>Tailored Line-Item Proposals</h2>
-  </div>
-
-  <div class="split">
-    <div class="panel">
-      <div class="panel-title">CUSTOM ESTIMATE INPUT</div>
-
-      <div class="slider-row">
-        <div class="srow-top">
-          <span class="slabel">Site Acreage</span>
-          <span class="sval">10+ acres</span>
+    <div class="hero">
+      <h1>Enterprise Site Telemetry & Scoping Engine</h1>
+      <p class="sub">Autonomous spatial mapping, volumetric analysis, and firestop verification tailored for Tier-1 General Contractors.</p>
+      
+      <!-- Interactive Square Footage Calculator -->
+      <div class="calc-box">
+        <div class="slider-label">
+          <span>Project Coverage Area:</span>
+          <strong id="sqft-display" style="color:var(--cyan);">50,000 sq. ft.</strong>
         </div>
-        <div class="track">
-          <div class="fill" style="width:38%"></div>
-          <div class="knob" style="left:38%"></div>
+        <input type="range" id="sqft-slider" min="10000" max="250000" step="5000" value="50000" oninput="updateCalculator()">
+      </div>
+
+      <!-- Service Tier Selection Buttons -->
+      <div class="tiers">
+        <div class="tier-card active" id="tier-1" onclick="selectTier(1, 10000, 'Baseline Telemetry', 'Weekly autonomous aerial scans + high-density point cloud capture.')">
+          <div class="tier-title">Tier 1: Core Telemetry</div>
+          <div class="tier-price">$10,000</div>
+          <div class="tier-desc">Weekly aerial scans & orthomosaic mapping for site walkthroughs.</div>
+        </div>
+        <div class="tier-card" id="tier-2" onclick="selectTier(2, 15000, 'Advanced Volumetrics', 'Bi-weekly LIDAR point clouds, earthwork volumetrics, & thermal audits.')">
+          <div class="tier-title">Tier 2: Enterprise Telemetry</div>
+          <div class="tier-price">$15,000</div>
+          <div class="tier-desc">LIDAR 3D modeling, thermal loss detection & penetration audit logs.</div>
         </div>
       </div>
 
-      <div class="slider-row">
-        <div class="srow-top">
-          <span class="slabel">Project Duration</span>
-          <span class="sval">6+ months</span>
+      <!-- Live Scope Output -->
+      <div class="output-panel">
+        <div class="output-header">
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-mid); text-transform: uppercase;">Estimated Scope Budget</div>
+            <div class="tier-title" id="selected-tier-name">Tier 1: Core Telemetry</div>
+          </div>
+          <div class="total-price" id="total-price-display">$10,000</div>
         </div>
-        <div class="track">
-          <div class="fill" style="width:62%"></div>
-          <div class="knob" style="left:62%"></div>
-        </div>
+        <p id="selected-tier-desc" style="font-size: 0.9rem; color: var(--text-mid); margin-bottom: 15px;">Weekly autonomous aerial scans + high-density point cloud capture.</p>
+        
+        <!-- Action Buttons -->
+        <button class="btn" onclick="openModal()">Request Formal Scope Proposal</button>
+        <button class="btn btn-secondary" onclick="window.print()">Export Spec Sheet (PDF)</button>
       </div>
-
-      <div class="slider-row" style="margin-bottom:0;">
-        <div class="srow-top">
-          <span class="slabel">Deliverable Depth</span>
-          <span class="sval">Full CAD + Thermal</span>
-        </div>
-        <div class="track">
-          <div class="fill" style="width:80%"></div>
-          <div class="knob" style="left:80%"></div>
-        </div>
-      </div>
-
-      <div class="impact-list">
-        <div class="impact-row"><span class="idot"></span><span><b>Acreage</b> sets flight-plan complexity and pass count per visit</span></div>
-        <div class="impact-row"><span class="idot"></span><span><b>Duration</b> determines cadence — one-time capture vs. recurring monthly passes</span></div>
-        <div class="impact-row"><span class="idot"></span><span><b>Deliverable depth</b> adds CAD integration and thermal audit layers to the base scope</span></div>
-      </div>
-
-      <div class="panel-fill"></div>
-      <div class="panel-note">Inputs shown reflect a typical mid-size commercial build. Final scope is confirmed after an initial site walk.</div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-title">ENTERPRISE SCOPE OUTPUT</div>
-      <div class="scope-output">
-        <div class="scope-line"><span class="k">Coverage</span><span class="v">10+ acres</span></div>
-        <div class="scope-line"><span class="k">Cadence</span><span class="v">Monthly passes</span></div>
-        <div class="scope-line"><span class="k">Mapping</span><span class="v">3D + Volumetrics</span></div>
-        <div class="scope-line"><span class="k">Audit Layer</span><span class="v">Thermal + Envelope</span></div>
-        <div class="scope-line"><span class="k">Est. Range</span><span class="v">$10,000–$15,000+</span></div>
-      </div>
-      <div class="panel-note" style="margin-top:22px;">Every proposal includes flight logs, the raw imagery archive, and a processed deliverables package.</div>
-      <div class="panel-fill"></div>
-      <div class="cta-btn">Request Proposal</div>
-    </div>
-  </div>
-  </div>
-
-  <div class="cta-card">
-    <h3>Ready to structure your enterprise site scope?</h3>
-    <div class="cta-contacts">
-      <span class="c1">steven@bastidor.ca</span>
-      <span class="c2">bastidor.ca</span>
     </div>
   </div>
 
-  <div class="footer">
-    <span>Slide 3 / 3 — Connect with BASTIDOR</span>
-    <span class="fkey">PROPOSAL.READY</span>
-  </div>
-</section>
+  <!-- Interactive Modal -->
+  <div class="modal" id="scope-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="modal-title">Confirm Project Parameters</div>
+      <p style="font-size: 0.9rem; color: var(--text-mid); margin-bottom: 20px;">Ready to initiate spatial telemetry scoping for your project?</p>
+      
+      <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; line-height: 1.8;">
+        <div><strong>Selected Tier:</strong> <span id="modal-tier">Tier 1</span></div>
+        <div><strong>Coverage Area:</strong> <span id="modal-sqft">50,000 sq ft</span></div>
+        <div><strong>Estimated Total:</strong> <span id="modal-total" style="color:var(--cyan); font-weight:700;">$10,000 CAD</span></div>
+      </div>
 
+      <button class="btn" onclick="sendScopeEmail()">Launch Pre-Filled Email Proposal</button>
+    </div>
+  </div>
+
+  <script>
+    let currentBasePrice = 10000;
+    let currentTierName = "Tier 1: Core Telemetry";
+    let currentTierDesc = "Weekly autonomous aerial scans + high-density point cloud capture.";
+    let currentSqFt = 50000;
+
+    function updateCalculator() {
+      currentSqFt = parseInt(document.getElementById('sqft-slider').value);
+      document.getElementById('sqft-display').innerText = currentSqFt.toLocaleString() + " sq. ft.";
+      
+      // Calculate scaled pricing ($0.05 per sqft over baseline 50k sqft)
+      let scaleMultiplier = currentSqFt > 50000 ? (currentSqFt - 50000) * 0.05 : 0;
+      let finalTotal = currentBasePrice + scaleMultiplier;
+
+      document.getElementById('total-price-display').innerText = "$" + finalTotal.toLocaleString();
+    }
+
+    function selectTier(tierNum, basePrice, name, desc) {
+      document.querySelectorAll('.tier-card').forEach(card => card.classList.remove('active'));
+      document.getElementById('tier-' + tierNum).classList.add('active');
+
+      currentBasePrice = basePrice;
+      currentTierName = "Tier " + tierNum + ": " + name;
+      currentTierDesc = desc;
+
+      document.getElementById('selected-tier-name').innerText = currentTierName;
+      document.getElementById('selected-tier-desc').innerText = currentTierDesc;
+
+      updateCalculator();
+    }
+
+    function openModal() {
+      document.getElementById('modal-tier').innerText = currentTierName;
+      document.getElementById('modal-sqft').innerText = currentSqFt.toLocaleString() + " sq ft";
+      document.getElementById('modal-total').innerText = document.getElementById('total-price-display').innerText + " CAD";
+      document.getElementById('scope-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('scope-modal').style.display = 'none';
+    }
+
+    function sendScopeEmail() {
+      let total = document.getElementById('total-price-display').innerText;
+      let subject = encodeURIComponent("BASTIDOR Scope Request - " + currentTierName);
+      let body = encodeURIComponent("Steven,\n\nWe would like to request a formal proposal for the following project scope:\n\n- Package: " + currentTierName + "\n- Est. Area: " + currentSqFt.toLocaleString() + " sq ft\n- Estimated Budget: " + total + " CAD\n\nPlease send over the formal contract details.\n\nBest regards,");
+      
+      window.location.href = "mailto:steven@bastidor.ca?subject=" + subject + "&body=" + body;
+    }
+  </script>
 </body>
 </html>
