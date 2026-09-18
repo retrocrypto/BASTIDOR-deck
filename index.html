@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BASTIDOR — Drone & Material Estimator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background-color: #060a0f; color: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; }
+    .radar-grid {
+      background-size: 30px 30px;
+      background-image: linear-gradient(to right, rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+    }
+    .pulse-glow { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: #1e293b;
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #06b6d4;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+  <!-- Header Navigation -->
+  <header class="flex flex-col md:flex-row justify-between items-center pb-6 border-b border-cyan-900/40 gap-4">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 bg-cyan-950/80 border border-cyan-500/40 rounded-lg text-cyan-400">
+        <i class="fa-solid fa-layer-group text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-wider text-white">BASTIDOR</h1>
+        <p class="text-xs tracking-widest text-cyan-400 uppercase font-mono">Drone & Material Estimator</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <nav class="hidden md:flex gap-6 text-sm text-slate-400 font-medium mr-4">
+        <a href="#" class="text-cyan-400 border-b border-cyan-400 pb-1">Dashboard</a>
+        <a href="#" class="hover:text-slate-200">Projects</a>
+        <a href="#" class="hover:text-slate-200">Fleet</a>
+        <a href="#" class="hover:text-slate-200">Reports</a>
+      </nav>
+      <a href="deck.html" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 rounded-md text-xs font-semibold tracking-wide transition">
+        View Scoping Deck <i class="fa-solid fa-arrow-right ml-1"></i>
+      </a>
+      <button class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-black font-semibold rounded-md text-xs tracking-wide transition">
+        + New Mission
+      </button>
+    </div>
+  </header>
+
+  <!-- Metric Overview Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 my-6">
+    <div class="p-4 bg-slate-900/60 border border-cyan-900/40 rounded-lg">
+      <p class="text-xs text-slate-400 font-mono tracking-wider uppercase">Active Coverage Area <span class="text-cyan-400">↑</span></p>
+      <p class="text-2xl md:text-3xl font-bold text-white mt-1"><span id="metricAcres">50</span> <span class="text-xs text-slate-400 font-normal">acres</span></p>
+    </div>
+    <div class="p-4 bg-slate-900/60 border border-cyan-900/40 rounded-lg">
+      <p class="text-xs text-slate-400 font-mono tracking-wider uppercase">Est. Data Volume <span class="text-cyan-400">↑</span></p>
+      <p class="text-2xl md:text-3xl font-bold text-white mt-1"><span id="metricData">1.8</span> <span class="text-xs text-slate-400 font-normal">TB</span></p>
+    </div>
+    <div class="p-4 bg-slate-900/60 border border-cyan-900/40 rounded-lg">
+      <p class="text-xs text-slate-400 font-mono tracking-wider uppercase">Projected Flight Hours <span class="text-slate-400">→</span></p>
+      <p class="text-2xl md:text-3xl font-bold text-white mt-1"><span id="metricHours">72</span> <span class="text-xs text-slate-400 font-normal">hrs</span></p>
+    </div>
+    <div class="p-4 bg-slate-900/60 border border-cyan-900/40 rounded-lg border-l-4 border-l-cyan-400">
+      <p class="text-xs text-slate-400 font-mono tracking-wider uppercase">Total Dynamic Scope</p>
+      <p class="text-2xl md:text-3xl font-bold text-cyan-400 mt-1" id="metricTotal">$4,850</p>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Telemetry Radar & Controls -->
+    <div class="lg:col-span-7 flex flex-col gap-6">
+      
+      <div class="bg-slate-900/80 border border-cyan-900/50 rounded-lg p-4 relative overflow-hidden flex flex-col justify-between h-[280px]">
+        <div class="flex justify-between items-center text-xs font-mono text-cyan-400 mb-2">
+          <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-cyan-400 pulse-glow"></span> LIVE FEED: ACTIVE</span>
+          <span>LAT: 34.0522° N | LON: 118.2437° W</span>
+        </div>
+        <div class="text-xs font-mono text-cyan-400/70 mb-2">ALT: 159.8m</div>
+
+        <div class="flex-1 radar-grid rounded-md border border-cyan-500/20 relative flex items-center justify-center">
+          <div class="w-36 h-36 rounded-full border border-cyan-500/30 flex items-center justify-center relative">
+            <div class="w-16 h-16 rounded-full border border-cyan-400/40 flex items-center justify-center">
+              <i class="fa-solid fa-crosshairs text-cyan-400 text-2xl pulse-glow"></i>
+            </div>
+          </div>
+          <div class="absolute bottom-2 left-3 text-[10px] font-mono text-slate-500">UNIT: 012-M2E</div>
+          <div class="absolute bottom-2 right-3 text-[10px] font-mono text-slate-500">SIGNAL: 98%</div>
+        </div>
+      </div>
+
+      <!-- Live Interactive Sliders -->
+      <div class="bg-slate-900/80 border border-cyan-900/50 rounded-lg p-5">
+        <h3 class="text-sm font-semibold text-slate-200 mb-4 flex items-center justify-between">
+          <span><i class="fa-solid fa-sliders text-cyan-400 mr-2"></i> Custom Project Scope Sliders</span>
+          <span class="text-xs font-mono text-cyan-400">REAL-TIME CALCULATION</span>
+        </h3>
+
+        <div class="mb-5">
+          <div class="flex justify-between text-xs font-mono mb-2">
+            <span class="text-slate-400">SITE COVERAGE AREA</span>
+            <span class="text-cyan-400 font-bold"><span id="valAcres">50</span> Acres</span>
+          </div>
+          <input type="range" id="sliderAcres" min="5" max="300" value="50" step="5">
+        </div>
+
+        <div class="mb-5">
+          <div class="flex justify-between text-xs font-mono mb-2">
+            <span class="text-slate-400">SCANS / VISITS PER MONTH</span>
+            <span class="text-cyan-400 font-bold"><span id="valVisits">3</span> Scans / mo</span>
+          </div>
+          <input type="range" id="sliderVisits" min="1" max="10" value="3" step="1">
+        </div>
+
+        <div class="mb-2">
+          <div class="flex justify-between text-xs font-mono mb-2">
+            <span class="text-slate-400">PROJECT DURATION</span>
+            <span class="text-cyan-400 font-bold"><span id="valDuration">4</span> Months</span>
+          </div>
+          <input type="range" id="sliderDuration" min="1" max="12" value="4" step="1">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Preset Scenarios & Live Chart -->
+    <div class="lg:col-span-5 flex flex-col gap-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-sm font-semibold text-slate-200">Preset Scenarios</h2>
+        <span class="text-[10px] font-mono text-slate-400">BASTIDOR RATE CARD v2.4</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="applyPreset(20, 2, 3)" class="p-2.5 bg-slate-900/90 border border-slate-800 rounded-lg hover:border-cyan-400 text-left transition">
+          <h4 class="text-[11px] font-semibold text-white">Standard</h4>
+          <p class="text-[9px] text-slate-400">20ac, 3mo</p>
+          <p class="text-xs font-bold text-cyan-400 mt-1">$3,550</p>
+        </button>
+
+        <button onclick="applyPreset(100, 4, 6)" class="p-2.5 bg-slate-900/90 border border-slate-800 rounded-lg hover:border-cyan-400 text-left transition">
+          <h4 class="text-[11px] font-semibold text-white">Core Map</h4>
+          <p class="text-[9px] text-slate-400">100ac, 6mo</p>
+          <p class="text-xs font-bold text-cyan-400 mt-1">$8,300</p>
+        </button>
+
+        <button onclick="applyPreset(30, 1, 1)" class="p-2.5 bg-slate-900/90 border border-slate-800 rounded-lg hover:border-cyan-400 text-left transition">
+          <h4 class="text-[11px] font-semibold text-white">Safety Scan</h4>
+          <p class="text-[9px] text-slate-400">30ac, 1mo</p>
+          <p class="text-xs font-bold text-cyan-400 mt-1">$1,850</p>
+        </button>
+      </div>
+
+      <div class="bg-slate-900/60 border border-cyan-900/40 rounded-lg p-4 flex-1">
+        <h3 class="text-xs font-semibold text-slate-300 mb-3">Live Monthly Projection ($k)</h3>
+        <div class="h-44 w-full">
+          <canvas id="expenditureChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const sliderAcres = document.getElementById('sliderAcres');
+    const sliderVisits = document.getElementById('sliderVisits');
+    const sliderDuration = document.getElementById('sliderDuration');
+
+    const valAcres = document.getElementById('valAcres');
+    const valVisits = document.getElementById('valVisits');
+    const valDuration = document.getElementById('valDuration');
+
+    const metricAcres = document.getElementById('metricAcres');
+    const metricData = document.getElementById('metricData');
+    const metricHours = document.getElementById('metricHours');
+    const metricTotal = document.getElementById('metricTotal');
+
+    const ctx = document.getElementById('expenditureChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4'],
+        datasets: [{
+          label: 'Monthly Projection ($k)',
+          data: [1.2, 2.4, 3.6, 4.8],
+          borderColor: '#06b6d4',
+          backgroundColor: 'rgba(6, 182, 212, 0.15)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: '#06b6d4'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+          y: { grid: { color: 'rgba(30, 41, 59, 0.5)' }, ticks: { color: '#64748b', font: { size: 10 } } }
+        }
+      }
+    });
+
+    function updateCalculator() {
+      const acres = parseInt(sliderAcres.value);
+      const visits = parseInt(sliderVisits.value);
+      const duration = parseInt(sliderDuration.value);
+
+      valAcres.innerText = acres;
+      valVisits.innerText = visits;
+      valDuration.innerText = duration;
+
+      const baseFee = 850;
+      const acresCost = acres * 18;
+      const visitCost = visits * duration * 320;
+      const totalCost = baseFee + acresCost + visitCost;
+
+      const totalVisits = visits * duration;
+      const flightHours = Math.round((acres * 0.25 + 1.5) * totalVisits);
+      const dataVolume = ((acres * 0.015 + 0.1) * totalVisits).toFixed(1);
+
+      metricAcres.innerText = acres;
+      metricData.innerText = dataVolume;
+      metricHours.innerText = flightHours;
+      metricTotal.innerText = '$' + totalCost.toLocaleString();
+
+      const monthlyCost = (totalCost / duration) / 1000;
+      const newChartData = [];
+      const newLabels = [];
+      
+      for (let i = 1; i <= Math.min(duration, 6); i++) {
+        newLabels.push(`Mo ${i}`);
+        newChartData.push((monthlyCost * i).toFixed(1));
+      }
+
+      chart.data.labels = newLabels;
+      chart.data.datasets[0].data = newChartData;
+      chart.update();
+    }
+
+    function applyPreset(acres, visits, duration) {
+      sliderAcres.value = acres;
+      sliderVisits.value = visits;
+      sliderDuration.value = duration;
+      updateCalculator();
+    }
+
+    sliderAcres.addEventListener('input', updateCalculator);
+    sliderVisits.addEventListener('input', updateCalculator);
+    sliderDuration.addEventListener('input', updateCalculator);
+
+    updateCalculator();
+  </script>
+</body>
+</html>
