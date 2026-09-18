@@ -1,24 +1,3 @@
- None selected
-
-Skip to content
-Using Gmail with screen readers
-
-1 of 12,567
-BASTIDOR - Code phase 1 AI
-Inbox
-
-Steven Ramirez <stevenramirez1@gmail.com>
-Attachments
-9:58 AM (5 minutes ago)
-to me
-
-Code phase 1 AI
-
-
-Steven Ramirez
-
- One attachment
-  •  Scanned by Gmail
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -50,7 +29,7 @@ export default function BastidorV4SpatialAIEngine() {
   const [scanMode, setScanMode] = useState<ScanMode>('thermal');
   const [isLiveScanning, setIsLiveScanning] = useState<boolean>(true);
 
-  // Material Estimator Parameters
+  // Material Estimator Parameters (Original Core)
   const [areaSqFt, setAreaSqFt] = useState<number>(3500);
   const [roofPitch, setRoofPitch] = useState<number>(6);
   const [materialType, setMaterialType] = useState<string>('architectural');
@@ -263,6 +242,7 @@ Thank you!`;
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
+        {}
         {/* Top 4 Telemetry Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-slate-900/80 border border-emerald-900/50 rounded-xl p-3.5 relative overflow-hidden">
@@ -306,6 +286,7 @@ Thank you!`;
           </div>
         </div>
 
+        {}
         {/* 4-Tab Navigation Bar */}
         <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-2">
           {[
@@ -329,6 +310,7 @@ Thank you!`;
           ))}
         </div>
 
+        {}
         {/* Tab 1: LSM BIM Inspector */}
         {activeTab === 'lsm_inspector' && (
           <div className="space-y-6">
@@ -459,6 +441,7 @@ Thank you!`;
           </div>
         )}
 
+        {}
         {/* Tab 2: Cellular NTRIP RTK */}
         {activeTab === 'ntrip_rtk' && (
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5 font-sans">
@@ -493,6 +476,7 @@ Thank you!`;
           </div>
         )}
 
+        {}
         {/* Tab 3: NFC Verified Tap Ledger */}
         {activeTab === 'nfc_ledger' && (
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5 font-sans">
@@ -537,7 +521,8 @@ Thank you!`;
           </div>
         )}
 
-        {/* Tab 4: Dynamic Material Scoper (Your Original Layout) */}
+        {}
+        {/* Tab 4: Dynamic Material Scoper (Original Layout Preserved) */}
         {activeTab === 'material_scoper' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
@@ -706,6 +691,7 @@ Thank you!`;
                   </div>
                 </div>
 
+                {}
                 {/* Direct Contact & Submission Box */}
                 <div className="mt-6 pt-6 border-t border-slate-800 space-y-3">
                   <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider font-mono">
@@ -783,5 +769,6 @@ Thank you!`;
     </div>
   );
 }
-Bastidor_V4.0_Spatial_AI_Engine.txt
-Displaying Bastidor_V4.0_Spatial_AI_Engine.txt.
+```
+
+Once committed to GitHub, Vercel will build this clean V4.0 update in under 45 seconds. Refresh your browser (or use Incognito mode) to test the new 4-tab bar live on **`https://www.bastidor.ca`**!
