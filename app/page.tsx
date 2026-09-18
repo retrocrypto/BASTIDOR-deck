@@ -1,5 +1,3 @@
-bastidor V4.0 with corrected 4Tab navigationbar correction code:
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -31,7 +29,7 @@ export default function Page() {
   const [scanMode, setScanMode] = useState<ScanMode>('thermal');
   const [isLiveScanning, setIsLiveScanning] = useState<boolean>(true);
 
-  // Material Estimator Parameters (Original Core)
+  // Material Estimator Parameters
   const [areaSqFt, setAreaSqFt] = useState<number>(3500);
   const [roofPitch, setRoofPitch] = useState<number>(6);
   const [materialType, setMaterialType] = useState<string>('architectural');
@@ -95,7 +93,6 @@ export default function Page() {
     },
   ];
 
-  // Pitch formula: A_effective = A * [1 + (P/12) * 0.15]
   const calculations = useMemo(() => {
     const pitchFactor = 1 + (roofPitch / 12) * 0.15;
     const adjustedArea = areaSqFt * pitchFactor;
@@ -192,11 +189,8 @@ Thank you!`;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-mono selection:bg-emerald-500 selection:text-slate-950 pb-12">
-      
-      {/* Header */}
       <header className="border-b border-emerald-900/40 bg-slate-950/95 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-slate-900 border border-emerald-500/60 flex items-center justify-center text-emerald-400 font-extrabold shadow-lg shadow-emerald-500/10">
               <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,14 +231,10 @@ Thank you!`;
               Contact Steven Directly
             </a>
           </div>
-
         </div>
       </header>
 
-      {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
-
-        {/* Top 4 Telemetry Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="bg-slate-900/80 border border-emerald-900/50 rounded-xl p-3.5 relative overflow-hidden">
             <div className="flex justify-between items-start text-[11px] text-slate-400 uppercase tracking-wider mb-1 font-sans">
@@ -287,7 +277,6 @@ Thank you!`;
           </div>
         </div>
 
-        {/* 4-Tab Navigation Bar */}
         <div className="flex flex-wrap items-center gap-2 border-b border-slate-800 pb-2">
           {[
             { id: 'lsm_inspector', label: '1. LSM BIM Inspector', icon: '🔍' },
@@ -310,7 +299,6 @@ Thank you!`;
           ))}
         </div>
 
-        {/* Tab 1: LSM BIM Inspector */}
         {activeTab === 'lsm_inspector' && (
           <div className="space-y-6">
             <div className="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-4 sm:p-6 relative overflow-hidden shadow-2xl">
@@ -328,7 +316,6 @@ Thank you!`;
                 </div>
               </div>
 
-              {/* Drone Radar HUD */}
               <div className="relative w-full h-72 sm:h-80 bg-slate-950 border border-emerald-900/60 rounded-xl overflow-hidden flex items-center justify-center">
                 <div 
                   className="absolute inset-0 opacity-20 pointer-events-none"
@@ -370,7 +357,6 @@ Thank you!`;
                 </div>
               </div>
 
-              {/* Mode Selection Controls */}
               <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
                 <div className="flex flex-wrap gap-2">
                   {(['thermal', 'pointcloud', 'bim', 'rgb'] as const).map((mode) => (
@@ -397,7 +383,6 @@ Thank you!`;
               </div>
             </div>
 
-            {/* Discrepancies Table */}
             <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl font-sans">
               <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider mb-3 font-mono flex items-center justify-between">
                 <span>LSM BIM Discrepancy Parsing Output</span>
@@ -440,7 +425,6 @@ Thank you!`;
           </div>
         )}
 
-        {/* Tab 2: Cellular NTRIP RTK */}
         {activeTab === 'ntrip_rtk' && (
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5 font-sans">
             <h3 className="text-base font-bold text-slate-100 font-mono flex items-center justify-between">
@@ -474,7 +458,6 @@ Thank you!`;
           </div>
         )}
 
-        {/* Tab 3: NFC Verified Tap Ledger */}
         {activeTab === 'nfc_ledger' && (
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5 font-sans">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono">
@@ -483,7 +466,7 @@ Thank you!`;
                   NTAG 424 DNA Cryptographic &quot;Verified Tap&quot; Audit Ledger
                 </h3>
                 <p className="text-xs text-slate-400 font-sans mt-0.5">
-                  Insurer-grade physical asset verification. Every tap generates a dynamic AES-128 cryptographic event hash (H_event).
+                  Insurer-grade physical asset verification. Every tap generates a dynamic AES-128 cryptographic event hash.
                 </p>
               </div>
 
@@ -518,13 +501,9 @@ Thank you!`;
           </div>
         )}
 
-        {/* Tab 4: Dynamic Material Scoper (Original Layout Preserved) */}
         {activeTab === 'material_scoper' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
             <div className="lg:col-span-7 space-y-5 font-sans">
-              
-              {/* Surface Area Slider */}
               <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
                 <div className="flex justify-between items-center mb-3">
                   <label className="text-sm font-bold text-slate-200">
@@ -545,7 +524,6 @@ Thank you!`;
                 />
               </div>
 
-              {/* Pitch Slider */}
               <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
                 <div className="flex justify-between items-center mb-3">
                   <label className="text-sm font-bold text-slate-200">
@@ -569,7 +547,6 @@ Thank you!`;
                 </p>
               </div>
 
-              {/* Material Selector */}
               <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
                 <label className="block text-sm font-bold text-slate-200 mb-3">
                   Material System
@@ -597,7 +574,6 @@ Thank you!`;
                 </div>
               </div>
 
-              {/* Payload Services */}
               <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
                 <label className="block text-sm font-bold text-slate-200 mb-3">
                   Bastidor V4.0 AI Spatial Payloads
@@ -652,10 +628,8 @@ Thank you!`;
                   </label>
                 </div>
               </div>
-
             </div>
 
-            {/* Estimate Summary & Direct Mail Dispatch */}
             <div className="lg:col-span-5 font-sans space-y-6">
               <div className="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
                 <h3 className="text-base font-extrabold text-white mb-4 border-b border-slate-800 pb-3 flex items-center justify-between font-mono">
@@ -687,7 +661,6 @@ Thank you!`;
                   </div>
                 </div>
 
-                {/* Direct Contact & Submission Box */}
                 <div className="mt-6 pt-6 border-t border-slate-800 space-y-3">
                   <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider font-mono">
                     Submit Proposal to Steven Ramirez
@@ -756,15 +729,11 @@ Thank you!`;
                 </div>
               </div>
             </div>
-
           </div>
         )}
-
       </main>
     </div>
   );
 }
 ```
-
-***
 
